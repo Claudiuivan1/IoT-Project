@@ -120,7 +120,10 @@ Now you can serve the file and the website will receive data from sensors in rea
 * [Video tutorial](https://youtu.be/4VNC8UzBAdM)
 * [Hackster blog article](https://www.hackster.io/claudiuivan1/mqtt-broker-for-real-time-data-db28d4)
 
-### Part 2 - RIOT MQTT-SN stations (coming soon)
+### Part 2 - RIOT MQTT-SN stations
+
+* [Video tutorial](https://youtu.be/xlfrrRODYE4)
+* [Hackster blog article](https://www.hackster.io/claudiuivan1/mqtt-broker-for-real-time-data-part-2-0b53f4)
 
 ## Authors
 
