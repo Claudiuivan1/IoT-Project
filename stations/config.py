@@ -1,3 +1,3 @@
 # MQTT Broker info
-MQTT_IP = '';
+MQTT_IP = '34.205.18.203';
 MQTT_PORT = 1883;
