@@ -74,13 +74,38 @@ The database is now ready. Take note of the credentials for the access.
 
 ### Start scripts
 
-At this point you are ready to run the scripts. Download the repository and follow this steps:
+At this point the scripts are ready to be run. You can choose between two options:
+* Simple Python MQTT stations
+* RIOT MQTT-SN stations (you will need a gateway)
+
+Once you've decided, download the repository and follow this steps:
+
+#### Simple Python MQTT stations
 
 1. Enter in **dbprocess** folder, open **config** file and set up the credentials (You can also edit the database update frequency. Default is every 15 minutes)
 2. Run **dbprocess.py**. Now the DB will be connected to the broker. Keep the script running
 3. Return in the main folder and now enter **stations** one. Edit config file again and then run **sensor.py**
 4. Shell commands will be printed. You can create a new stations using **start** command. 
 5. Once you've created two stations, the system will be up
+
+#### RIOT MQTT-SN stations
+
+1. Setup Paho MQTT-SN transparent gateway ([See more here](https://www.eclipse.org/paho/components/mqtt-sn-transparent-gateway/)) followiing the guide provided in the readme file of this [repository](https://github.com/eclipse/paho.mqtt-sn.embedded-c/tree/master/MQTTSNGateway).  
+This address and port can be used as an example configuration:
+```
+fec0:affe::1 1885
+```
+2. Configure the gateway with an IPv6 address for MQTT-SN connection and the IPv4 address of the cloud MQTT broker.
+3. Start the gateway
+4. Enter in **dbprocess** folder, open **config** file and set up the credentials (You can also edit the database update frequency. Default is every 15 minutes)
+5. Run **dbprocess.py**. Now the DB will be connected to the broker. Keep the script running
+6. Return in the main folder and now enter **riot_station** one, setup Makefile with currect RIOT path and compile
+7. Assign a site-global address using the same prefix of gateway one, with this command:
+```
+ifconfig 5 add fec0:affe::99
+```
+to RIOT process and connect to gateway using **start** command 
+8. Once you've created two stations with two differents terminal instances, the system will be up
 
 ### Website
 
@@ -90,8 +115,15 @@ Now you can serve the file and the website will receive data from sensors in rea
 
 ## Useful links
 
+### Part 1 - Python MQTT stations
+
 * [Video tutorial](https://youtu.be/4VNC8UzBAdM)
 * [Hackster blog article](https://www.hackster.io/claudiuivan1/mqtt-broker-for-real-time-data-db28d4)
+
+### Part 2 - RIOT MQTT-SN stations
+
+* [Video tutorial](https://youtu.be/xlfrrRODYE4)
+* [Hackster blog article](https://www.hackster.io/claudiuivan1/mqtt-broker-for-real-time-data-part-2-0b53f4)
 
 ## Authors
 
