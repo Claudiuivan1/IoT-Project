@@ -3,7 +3,7 @@ APPLICATION = riot_lora
 BOARD ?= b-l072z-lrwan1
 
 # RIOT base directory path:
-RIOTBASE ?= $(CURDIR)/../RIOT
+RIOTBASE ?= $(CURDIR)/../../../RIOT
 
 BOARD_WITHOUT_LORAMAC_RX := \
     arduino-mega2560 \

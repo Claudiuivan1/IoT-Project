@@ -4,4 +4,4 @@ MQTT_TTN_PASS = '';
 
 # Second MQTT Broker info
 MQTT_CLOUD_IP = '';
-MQTT_CLOUD_PORT_TWO = 1883;
+MQTT_CLOUD_PORT = 1883;

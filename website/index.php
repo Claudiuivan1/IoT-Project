@@ -152,7 +152,7 @@
         
         <script>
             // MQTT broker
-            var HOST = "54.211.140.95";
+            var HOST = "";
             var PORT = 8083;
 
             // Array of stations
