@@ -91,6 +91,8 @@ Once you've decided, download the repository and follow this steps:
 4. Shell commands will be printed. You can create a new stations using **start** command. 
 5. Once you've created two stations, the system will be up
 
+See more on my Hackster article [here](https://www.hackster.io/claudiuivan1/1-iot-mqtt-system-broker-db-and-python-stations-db28d4)
+
 #### RIOT MQTT-SN stations
 
 1. Setup Paho MQTT-SN transparent gateway ([See more here](https://www.eclipse.org/paho/components/mqtt-sn-transparent-gateway/)) followiing the guide provided in the readme file of this [repository](https://github.com/eclipse/paho.mqtt-sn.embedded-c/tree/master/MQTTSNGateway).  
@@ -102,7 +104,7 @@ fec0:affe::1 1885
 3. Start the gateway
 4. Enter in **dbprocess** folder, open **config** file and set up the credentials (You can also edit the database update frequency. Default is every 15 minutes)
 5. Run **dbprocess.py**. Now the DB will be connected to the broker. Keep the script running
-6. Return in the main folder and now enter **riot_station** one, setup Makefile with currect RIOT path and compile
+6. Enter **riot_station** folder, setup Makefile with currect RIOT path and compile
 7. Assign a site-global address using the same prefix of gateway one, with this command:
 ```
 ifconfig 5 add fec0:affe::99
@@ -110,9 +112,42 @@ ifconfig 5 add fec0:affe::99
 to RIOT process and connect to gateway using **start** command 
 8. Once you've created two stations with two differents terminal instances, the system will be up
 
+See more on my Hackster article [here](https://www.hackster.io/claudiuivan1/2-iot-mqtt-system-riot-stations-0b53f4)
+
 #### RIOT LoRa - TTN stations
 
-Coming soon
+1. Create [IoT-LAB](https://www.iot-lab.info/) and [The Things Network](https://www.thethingsnetwork.org/) accounts and setup them
+2. Enter **riot_lora_station/transparent_bridge** folder, edit the **config** file with your TTN and cloud broker infos
+3. Run **transparent_bridge.py**. The bridge will be connected to TTn and to your broker, keep it running
+4. Enter **riot_lora_station/station** folder, setup Makefile with currect RIOT path and compile
+5. Copy the elf file on your IoT-LAB home, using
+```
+$ scp bin/b-l072z-lrwan1/riot_lora.elf <USERNAME>@saclay.iot-lab.info:riot_lora.elf
+```
+6. Login in IoT through SSH, create a new experiment and flash the elf file
+```
+$ ssh <USERNAME>@saclay.iot-lab.info
+$ iotlab-auth -u <USERNAME>
+$ iotlab-experiment submit -n <NAME-OF-EXPERIMENT> -d 60 -l 2,archi=st-lrwan1:sx1276+site=saclay 
+$ iotlab-experiment get -i <EXPERIMENT-ID> -s
+$ iotlab-experiment get -i <EXPERIMENT-ID> -r
+$ iotlab-node --update riot_lora.elf -l saclay,st-lrwan1,<DEVICE-ID>
+```
+7. Access the app shell, connect to TTN and start the station
+```
+$ nc st-lrwan1-<DEVICE-ID> 20000
+```
+```
+> loramac set deveui <DEVICE-EUI>
+> loramac set appeui <APP EUI>
+> loramac set appkey <APP-KEY>
+> loramac set dr 5
+> loramac join otaa
+> start <STATION-ID>
+```
+The commands has to be executed one by one. Check the below mentioned article for more detailed informations.
+
+See more on my Hackster article [here](https://www.hackster.io/claudiuivan1/3-iot-mqtt-system-lora-and-ttn-61c4f2)
 
 ### Website
 
