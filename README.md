@@ -1,8 +1,8 @@
 # MQTT IoT Service
 
-This repository contains all the scripts and files to build up an IoT service based on AWS, Mosquitto MQTT broker, Paho libraries and MySQL DB.
+This repository contains all the scripts and files to build up an IoT service based on AWS, Mosquitto MQTT broker, Paho libraries and MySQL DB and some different types of sensors (Python local, RIOT based local, RIOT based using LoRa and TTN).
 The system consists in a sensor emulator, a cloud based broker, an intermediate MQTT client for DB and a website showing data. 
-The code is written using Python, SQL, HTML, Javascript and PHP.  
+The code is written using Python, C, SQL, HTML, Javascript and PHP.  
 
 ## Getting Started
 
@@ -11,16 +11,18 @@ You will also need an AWS account in order to build up the cloud service.
 
 ### Prerequisites
 
-Paho Python and PyMySQL libraries were used, so you will need to install them:
+Paho Python and PyMySQL libraries were used, so you will need to install them. If you choose LoRa - TTN stations you will also need the The Things Network library. Type this commands to have all up:
 
 ```
 $ pip install paho-mqtt
 $ pip install PyMySQL
+$ pip install ttn
 ```
 
 More info:  
 * [Paho](https://pypi.org/project/paho-mqtt/)  
 * [PyMySQL](https://pypi.org/project/PyMySQL/)
+* [TTN](https://pypi.org/project/ttn/)
 
 Website uses PHP functions to interact with the database, so you will need a local server. I recommend you to install Visual Studio Code and its PHP Server plugin.
 
@@ -74,9 +76,10 @@ The database is now ready. Take note of the credentials for the access.
 
 ### Start scripts
 
-At this point the scripts are ready to be run. You can choose between two options:
+At this point the scripts are ready to be run. You can choose between three options:
 * Simple Python MQTT stations
 * RIOT MQTT-SN stations (you will need a gateway)
+* RIOT LoRa - TTN stations (you will need a The Things Network account)
 
 Once you've decided, download the repository and follow this steps:
 
@@ -106,6 +109,10 @@ ifconfig 5 add fec0:affe::99
 ```
 to RIOT process and connect to gateway using **start** command 
 8. Once you've created two stations with two differents terminal instances, the system will be up
+
+#### RIOT LoRa - TTN stations
+
+Coming soon
 
 ### Website
 
