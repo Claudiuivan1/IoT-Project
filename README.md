@@ -169,8 +169,8 @@ Now you can serve the file and the website will receive data from sensors in rea
 
 ### Part 3 - RIOT LoRa TTN stations
 
-* [Video tutorial]() COMING SOON
-* [Hackster blog article]() COMING SOON
+* [Video tutorial](https://www.hackster.io/claudiuivan1/3-iot-mqtt-system-lorawan-and-ttn-61c4f2)
+* [Hackster blog article](https://www.youtube.com/watch?v=nv5WgZYVP1k)
 
 ## Authors
 
