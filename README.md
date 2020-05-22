@@ -156,9 +156,9 @@ As was written in the prerequisites, you should have installed a program or a se
 Before opening the webpage, edit the index file and go down to the javascript code, then edit **HOST** and **PORT** variables.  
 Now you can serve the file and the website will receive data from sensors in real time and retrive last four updates from the database.
 
-### Crowdsensing
+### Activity recognition
 
-The MQTT Mosquitto broker can also be used to set up a really simple crowdsensing web app service. All the informations about this part, can be found [here](https://github.com/Claudiuivan1/IoT-Project/tree/master/website_crowdsensing).
+The MQTT Mosquitto broker can also be used to set up a really simple activity recognition web app service. All the informations about this part, can be found [here](https://github.com/Claudiuivan1/IoT-Project/tree/master/website_crowdsensing).
 
 ## Useful links
 
@@ -177,10 +177,10 @@ The MQTT Mosquitto broker can also be used to set up a really simple crowdsensin
 * [Video tutorial](https://www.youtube.com/watch?v=nv5WgZYVP1k)
 * [Hackster blog article](https://www.hackster.io/claudiuivan1/3-iot-mqtt-system-lorawan-and-ttn-61c4f2)
 
-### Part 4 - Crowdsensing web service
+### Part 4 - Activity recognition and cloud analysis
 
-* [Video tutorial]() coming soon
-* [Hackster blog article]() coming soon
+* [Video tutorial](https://www.hackster.io/claudiuivan1/4-iot-mqtt-system-crowdsensing-and-cloud-analysis-323ff6) coming soon
+* [Hackster blog article](https://youtu.be/uvwUmiBE9js)
 
 ## Authors
 
