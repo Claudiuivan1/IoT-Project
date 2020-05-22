@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Acceleration</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+
+        <script src="./js/paho-mqtt-min.js"></script>
+    </head>
+
+    <body>
+
+        <div class="container mt-5">
+			
+			<div class="alert alert-primary" role="alert">
+                <h4 class="alert-heading pt-2">Crowdsensing</h4>
+                
+                <hr>
+
+                <div id="acceleration">Waiting for data</div>
+                <div id="state"></div>
+            </div>
+
+        </div>
+        
+        <script>
+
+            /******************************/
+            /** PAHO MQTT INITIALIZAZION **/
+            /******************************/
+        
+            var HOST = "";
+            var PORT = 9883;
+        
+            // Callback handlers for connection up and lost
+            function onConnect() {
+            client.subscribe("both_directions");
+            console.log("connected");
+            }
+        
+            // called when the client loses its connection
+            function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:"+responseObject.errorMessage);
+            }
+            }
+        
+            // Create a client instance
+            client = new Paho.MQTT.Client(HOST, Number(PORT), "phone");
+
+            // Set callback handlers
+            client.onConnectionLost = onConnectionLost;
+
+            // connect the client
+            client.connect( { onSuccess: onConnect, useSSL: true } );
+
+
+            
+        
+            /*******************************/
+            /***** GENERIC API SENSORS *****/
+            /*******************************/
+
+            let accelerometer = null;
+            try {
+                // Initialize accelerometer
+                accelerometer = new LinearAccelerationSensor({ frequency: 1 });
+                accelerometer.addEventListener('error', event => {
+                    // Handle runtime errors
+                    if (event.error.name === 'NotAllowedError') {
+                        console.log('Permission to access sensor was denied.');
+                    } else if (event.error.name === 'NotReadableError' ) {
+                        console.log('Cannot connect to the sensor.');
+                    }
+                });
+
+                // Set onreading function for edge computing and MQTT message sending
+                accelerometer.onreading = () => { 
+
+                    // Compute complexive acceleration and display it
+                    acceleration = Math.sqrt(accelerometer.x * accelerometer.x + accelerometer.y * accelerometer.y + accelerometer.z * accelerometer.z);
+                    document.getElementById('acceleration').innerHTML = "State: <strong>" + Math.round(acceleration * 100) / 100 + "</strong> m/s";
+
+                    // Edge-computing for state
+                    let state = "";
+                    if(acceleration > 5)
+                        state = "Running"
+                    if(acceleration > 0.6 && acceleration <= 5)
+                        state = "Walking"
+                    if(acceleration <= 0.6)
+                        state = "Stuck"
+                    document.getElementById('state').innerHTML = "State: <strong>" + state + "</strong>";
+                    
+                    // Sending MQTT messages
+                    message = new Paho.MQTT.Message("{\"timestamp\": \"" + Math.round((new Date()).getTime()) + "\", \"state\": \"" + state + "\"}");
+                    message.destinationName = "both_directions";
+                    client.send(message);
+
+                    message = new Paho.MQTT.Message("{\"timestamp\": \"" + Math.round((new Date()).getTime()) + "\", \"acceleration\": " + acceleration.toFixed(2) + "}");
+                    message.destinationName = "localgateway_to_awsiot";
+                    client.send(message);
+            }
+
+            // Ask permissions for sensors, before starting
+            navigator.permissions.query({ name: 'accelerometer' })
+                .then(result => {
+                    if (result.state === 'denied') {
+                        console.log('Permission to use accelerometer sensor is denied.');
+                        return;
+                    }
+                    accelerometer.start();
+                });
+
+            } catch (error) {
+                // Handle construction errors.
+                if (error.name === 'SecurityError') {
+                    console.log('Sensor construction was blocked by the Feature Policy.');
+                } else if (error.name === 'ReferenceError') {
+                    console.log('Sensor is not supported by the User Agent.');
+                } else {
+                    throw error;
+                }
+            }
+            
+        </script>
+    </body>
+</html>

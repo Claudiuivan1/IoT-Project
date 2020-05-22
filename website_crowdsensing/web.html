@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sensors</title>
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+        
+        <script src="./js/paho-mqtt-min.js"></script>
+        <script src="./js/jquery-3.4.1.min.js"></script>
+		<script src="./js/bootstrap.min.js"></script>
+		<script src="./js/functions.js"></script>
+        <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+    </head>
+    <body>
+		<div class="container mt-5">
+			
+			<div class="row">
+				<div class="col">
+					
+					<div class="container">
+						<h3 class="mb-4">Cloud computing</h3>
+
+						<!-- Real time sensor values -->
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-primary" id="sens_cloud" role="alert">
+									<h4 class="alert-heading pt-2">User state</h4>
+										
+									<hr>
+
+									<div class="row state">
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Last hour sensor values -->
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-primary" id="sens_last_cloud" role="alert">
+									<h4 class="alert-heading pt-2">Last hour</h4>
+										
+									<hr>
+
+									<div style="height: 400px; max-height: 400px; overflow-y: scroll;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th scope="col">Timestamp</th>
+													<th scope="col">State</th>
+												</tr>
+											</thead>
+											<tbody id="last-cloud">
+												
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				
+				</div>
+				
+				<div class="col">
+					<div class="container">
+						<h3 class="mb-4">Edge computing</h3>
+						
+						<!-- Real time sensor values -->
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-primary" id="sens_edge" role="alert">
+									<h4 class="alert-heading pt-2">User state</h4>
+										
+									<hr>
+
+									<div class="row state">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Last hour sensor values -->
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-primary" id="sens_last_edge" role="alert">
+									<h4 class="alert-heading pt-2">Last hour</h4>
+										
+									<hr>
+
+									<div style="height: 400px; max-height: 400px; overflow-y: scroll;">
+										<table class="table">
+											<thead>
+												<tr>
+													<th scope="col">Timestamp</th>
+													<th scope="col">State</th>
+												</tr>
+											</thead>
+											<tbody id="last-edge">
+												
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+					
+				</div>
+			</div>
+		</div>
+        
+        <script>
+
+			/************************************************/
+			/**** MQTT INTERACTION FOR REAL TIME VALUES  ****/
+			/************************************************/
+
+            // MQTT broker
+            var HOST = "";
+            var PORT = 8083;
+
+            // Array of stations
+            var stations = [];
+
+            // Callback handlers for connection up and lost
+            function onConnect() {
+                // Once a connection has been made, make a subscription
+                client.subscribe("awsiot_to_localgateway");
+				client.subscribe("both_directions");
+            }
+
+            function onConnectionLost( responseObject ) {
+                if ( responseObject.errorCode !== 0 ) {
+                    console.log( "onConnectionLost:" + responseObject.errorMessage );
+                }
+            }
+
+            // Callback for received message from MQTT broker
+            function onMessageArrived( message ) {
+
+                var sens_id;
+				var mess = JSON.parse( message.payloadString );
+
+				// Get the proper topic and display correct data
+				var topic = message.destinationName;
+
+				if( topic == "awsiot_to_localgateway" ) { // CLOUD COMPUTING
+					sens_id = "#sens_cloud";
+
+					// Use JQuery in order to inject data into HTML code
+					$( sens_id + ' .state' ).empty().append( "<div class='col'>State: <span class='font-weight-bold'>" + mess.state + "</span></div>" +
+															"<div class='col'>Acceleration: <span class='font-weight-bold'>" + mess.acceleration + "</span> m/s</div>" );
+				} else if( topic == "both_directions" ) { // EDGE COMPUTING
+					sens_id = "#sens_edge";
+
+					// Use JQuery in order to inject data into HTML code
+					$( sens_id + ' .state' ).empty().append( "<div class='col'>State: <span class='font-weight-bold'>" + mess.state + "</span></div>" );
+				}
+			}
+
+            // Create a client instance with paho javascript api
+            var client = new Paho.MQTT.Client( HOST, Number(PORT), "website" );
+
+            // Set callback handlers
+            client.onConnectionLost = onConnectionLost;
+            client.onMessageArrived = onMessageArrived;
+
+            // Connect the client to MQTT broker
+            client.connect( { onSuccess: onConnect } );
+            
+
+			
+			/************************************************/
+            /** DYNAMO DB INTERACTION FOR LAST HOUR VALUES **/
+			/************************************************/
+            
+			// AWS Cognito identity credentials configuration
+			AWS.config.region = "us-east-1";
+			AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: "us-east-1:73b2cfba-525a-4f90-ba69-2c4ca9de375a",
+			});
+
+			// Dynamo DB connection
+			var dynamodb = new AWS.DynamoDB();
+			var docClient = new AWS.DynamoDB.DocumentClient();
+			
+			var id;
+			
+			var curr_timestamp = String(Date.now());
+			var last_timestamp = String(Date.now() - 3600000);
+			
+			// crowd-cloud table scanning
+			var params = {
+				TableName: "crowd-cloud",
+				ProjectionExpression: "#timestamp, payload",
+				FilterExpression: "#timestamp between :last_timestamp and :curr_timestamp",
+				ExpressionAttributeNames: {
+					"#timestamp": "timestamp"
+				},
+				ExpressionAttributeValues: {
+					":curr_timestamp": curr_timestamp,
+					":last_timestamp": last_timestamp
+				}
+			};
+
+			docClient.scan(params, onScanCloud);
+			
+			// Display each record in proper way
+			function onScanCloud(err, data) {
+				if (err) {
+					console.log("Error", err);
+				} else {
+					var table = '';
+					var state = '';
+					var elems = {};
+					data.Items.forEach(function (element) {
+						if(element.payload.acceleration <= 0.6)
+							state = 'Stuck';
+						else if(element.payload.acceleration > 0.6 && element.payload.acceleration <= 5)
+							state = 'Walking';
+						else if(element.payload.acceleration > 5)
+							state = 'Running';
+						elems[element.timestamp] = state;
+					});
+					
+					elems = sortOnKeys(elems);
+					
+					for(var key in elems) {
+						var convtime = timestampConvert( key );
+						table += '<tr></tr><td id="timestamp">' + convtime + '</td><td id="state_last">' + elems[key] + '</td></tr>';
+					}
+					document.getElementById('last-cloud').innerHTML = table;
+				}
+			}
+
+			// crowd-cloud table scanning
+			var params = {
+				TableName: "crowd-edge",
+				ProjectionExpression: "#timestamp, payload",
+				FilterExpression: "#timestamp between :last_timestamp and :curr_timestamp",
+				ExpressionAttributeNames: {
+					"#timestamp": "timestamp"
+				},
+				ExpressionAttributeValues: {
+					":curr_timestamp": curr_timestamp,
+					":last_timestamp": last_timestamp
+				}
+			};
+
+			docClient.scan(params, onScanEdge);
+			
+			// Display each record in proper way
+			function onScanEdge(err, data) {
+				if (err) {
+					console.log("Error", err);
+				} else {
+					var table = '';
+					var elems = {};
+					data.Items.forEach(function (element) {
+						elems[element.timestamp] = element.payload.state;
+					});
+					
+					elems = sortOnKeys(elems);
+					
+					for(var key in elems) {
+						var convtime = timestampConvert( key );
+						table += '<tr></tr><td id="timestamp">' + convtime + '</td><td id="state_last">' + elems[key] + '</td></tr>';
+					}
+					document.getElementById('last-edge').innerHTML = table;
+				}
+			}
+			
+        </script>
+    </body>
+</html>
