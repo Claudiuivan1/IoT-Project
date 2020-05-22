@@ -1,6 +1,6 @@
 # Activity recognition web app
 
-This directory contains all the files needed to build a really simple crowdsensing web app.
+This directory contains all the files needed to build a really simple activity recognition web app.
 The content is structured in two web pages: the first one which has to be opened from the a mobile phone and will collect data from its accelerometer, and the second one which will display the informations collected by the smarphone.
 Data elaboration works through two parallel binaries: a cloud computation in which the model is computed by the AWS cloud IoT service and an edge computation, which uses a local smarphone computation and sends the resulting state.
 
