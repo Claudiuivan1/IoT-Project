@@ -179,8 +179,8 @@ The MQTT Mosquitto broker can also be used to set up a really simple activity re
 
 ### Part 4 - Activity recognition and cloud analysis
 
-* [Video tutorial](https://www.hackster.io/claudiuivan1/4-iot-mqtt-system-crowdsensing-and-cloud-analysis-323ff6)
-* [Hackster blog article](https://youtu.be/uvwUmiBE9js)
+* [Video tutorial](https://youtu.be/uvwUmiBE9js)
+* [Hackster blog article](https://www.hackster.io/claudiuivan1/4-iot-mqtt-system-crowdsensing-and-cloud-analysis-323ff6)
 
 ## Authors
 
