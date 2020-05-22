@@ -1,4 +1,4 @@
-# Crowdsensing web app
+# Activity recognition web app
 
 This directory contains all the files needed to build a really simple crowdsensing web app.
 The content is structured in two web pages: the first one which has to be opened from the a mobile phone and will collect data from its accelerometer, and the second one which will display the informations collected by the smarphone.
@@ -50,7 +50,7 @@ At this point you need to configure the DynamoDB tables which will collect the d
 You can do this easily:
 
 1. Access the AWS console panel and go to the DynamoDB section
-2. Create two tables, with this names: **crowd-edge** and ***crowd-cloud**, put "timestamp" in the primary key field
+2. Create two tables, with this names: **crowd-edge** and **crowd-cloud**, put "timestamp" in the primary key field
 3. Go to the IoT core section and enter in **action execution**, then create a new rule
 4. The first rule will have "both_directions" as source and will simply put all the messages in the "crowd-edge" table. Hash key: **timestamp** and Hash value: **${timestamp}**
 5. The second one will have "localgateway_to_awsiot" as source and will do two actions: automatic insertion in "crowd-cloud" table and Lambda function execution. Again Hash key: **timestamp** and Hash value: **${timestamp}**
